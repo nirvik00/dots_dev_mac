@@ -63,6 +63,7 @@ namespace dots_dev
                             adjObjLi.Add(str);
                         }catch(Exception e)
                         {
+                            Console.Write(e);
                             // do nothing
                         }                        
                     }

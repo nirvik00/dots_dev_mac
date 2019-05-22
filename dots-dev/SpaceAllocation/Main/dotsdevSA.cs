@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using Grasshopper.Kernel;
 using Rhino.Geometry;
+using Rhino;
+using Rhino.DocObjects;
 
 namespace dots_dev
 {
@@ -11,8 +13,9 @@ namespace dots_dev
         // global variables
         List<string> adjMatrixStr = new List<string>(); // adjacency matrix
         List<string> geomSpaceStr = new List<String>(); // functional space - geometric requirements
-        List<string> adjObjLi = new List<string>(); // final adj obj list
-        List<string> geomObjLi = new List<string>(); // final geom object list 
+        List<string> adjObjLi = new List<string>();     // final adj obj list
+        List<string> geomObjLiStr = new List<string>(); // final geom object list as string
+        List<GeomEntry> geomObjLi = new List<GeomEntry>();
 
         public dotsdevSA()
           : base("dots_dev", "inputs",
@@ -29,10 +32,12 @@ namespace dots_dev
 
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            // pManager.AddTextParameter("Output Adjacency Intermediate", "oAdj0", "intermediate output of reading adjacency requirements", GH_ParamAccess.list);
-            // pManager.AddTextParameter("Output Functions Intermediate", "oGeom0", "intermediate output of reading geometric requirements", GH_ParamAccess.list);
             pManager.AddTextParameter("Output Adjacency", "oAdj", "output of reading adjacency requirements", GH_ParamAccess.list);
             pManager.AddTextParameter("Output Functions", "oGeom", "output of reading spatial (geometric) requirements", GH_ParamAccess.list);
+            pManager.AddTextParameter("Temp Geom Obj List", "oBSP", "Output list of Geom objs", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Display Polyline", "oPoly", "Output list of Polyline", GH_ParamAccess.item);
+            pManager.AddTextParameter("rnd vals", "oRnd", "output random vals", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Recursive Polys", "rPolys", "output polys", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -49,26 +54,33 @@ namespace dots_dev
 
             CsvParser csvParserGeom = new CsvParser(geomFilePath);
             geomSpaceStr = csvParserGeom.readFile(); // list of strings - not fields
-            geomObjLi = csvParserGeom.GetGeomObjLi(geomSpaceStr); // list of geom objs
-            
-            // geomSpaceStr
-            // DA.SetDataList(0, adjMatrixStr); // deprecated
-            // DA.SetDataList(1, geomSpaceStr); //deprecated
+            geomObjLiStr = csvParserGeom.GetGeomObjLi(geomSpaceStr); // overloaded: list of geom objs
+            List<GeomEntry> geomObjLi = csvParserGeom.GetGeomObjLi();
+
+            List<string> fstr = new List<string>();
+            for(int i=0; i<geomObjLi.Count; i++) 
+            { fstr.Add(geomObjLi[i].displayString()); }
+
             DA.SetDataList(0, adjObjLi);
-            DA.SetDataList(1, geomObjLi);
+            DA.SetDataList(1, geomObjLiStr);
+            DA.SetDataList(2, fstr);
+
+
+            BspGeom bspgeom = new BspGeom(); // class for geom methods
+            PolylineCurve poly = bspgeom.GenerateInitialCurve(geomObjLi);
+            DA.SetData(3, poly);
+
+            List<PolylineCurve> polys=new List<PolylineCurve>();
+            bspgeom.RunRecursions(poly, 0, polys);
+            List<PolylineCurve> fpolys = bspgeom.GetFPolys();
+            List<string> rvals = bspgeom.GetRVals();
+            DA.SetDataList(4, rvals);
+            DA.SetDataList(5, fpolys);
+
         }
 
-        protected override System.Drawing.Bitmap Icon
-        {
-            get
-            {
-                return null;
-            }
-        }
+        protected override System.Drawing.Bitmap Icon { get { return null; } }
 
-        public override Guid ComponentGuid
-        {
-            get { return new Guid("73dd4e25-553b-4853-a8e4-5d17d96afa84"); }
-        }
+        public override Guid ComponentGuid { get { return new Guid("73dd4e25-553b-4853-a8e4-5d17d96afa84"); } }
     }
 }

@@ -28,25 +28,20 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="Grasshopper">
-      <HintPath>..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\ManagedPlugIns\GrasshopperPlugin.rhp\Grasshopper.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GH_IO">
-      <HintPath>..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\ManagedPlugIns\GrasshopperPlugin.rhp\GH_IO.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Eto">
+      <HintPath>..\..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\Eto.dll</HintPath>
     </Reference>
     <Reference Include="RhinoCommon">
-      <HintPath>..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\RhinoCommon.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\RhinoCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="GH_IO">
+      <HintPath>..\..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\ManagedPlugIns\GrasshopperPlugin.rhp\GH_IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Grasshopper">
+      <HintPath>..\..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\ManagedPlugIns\GrasshopperPlugin.rhp\Grasshopper.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.UI">
-      <HintPath>..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\Rhino.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Eto">
-      <HintPath>..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\Eto.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\Applications\Rhinoceros.app\Contents\Resources\Rhino.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -54,9 +49,15 @@
     <Compile Include="SpaceAllocation\CsvInputParsers\CsvParser.cs" />
     <Compile Include="SpaceAllocation\CsvInputParsers\MakeAdjacencyObjList.cs" />
     <Compile Include="SpaceAllocation\CsvInputParsers\MakeGeomObjList.cs" />
-    <Compile Include="SpaceAllocation\GenerateGeometry\BSP.cs" />
     <Compile Include="SpaceAllocation\Main\dots_devInfo.cs" />
     <Compile Include="SpaceAllocation\Main\dotsdevSA.cs" />
+    <Compile Include="SpaceAllocation\BooleanFunctions\BooleanOperations.cs" />
+    <Compile Include="SpaceAllocation\GenerateGeometry\CurveSkeleton.cs" />
+    <Compile Include="SpaceAllocation\GenerateGeometry\BspGeom.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="SpaceAllocation\CsvInputParsers\GeomEntry.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SpaceAllocation\.DS_Store" />

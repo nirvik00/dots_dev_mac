@@ -1,59 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace dots_dev
 {
-    class GeomEntry
-    {
-        private string Name;
-        private double Area;
-        private double RatioA;
-        private double RatioB;
-        private double Length=0.00;
-        private double Width=0.00;
-        private int Number=1;
 
-        string OPT = ""; // send option of the constructor
-
-        public GeomEntry() { }
-        public GeomEntry(string name, double area, double a, double b, int num)
-        {
-            Name = name;
-            Area = area;
-            RatioA = a;
-            RatioB = b;
-            Length = Area * RatioA;
-            Width = Area * RatioB;
-            Number = num;
-            OPT = "opt-0";
-        }
-        public GeomEntry(string name, double l, double w, int num)
-        {
-            Name = name;
-            Length = l;
-            Width = w;
-            Number = num;
-            OPT = "opt-1";
-        }
-        public string displayString()
-        {
-            string s = Name + "," + Length + "," + Width + "," + Number + "," + OPT;
-            return s;
-        }
-    }
     class MakeGeomObjList
     {
-        List<string> input;
-        List<string> geomObjLi;
 
+
+        private List<string> input;
+        private List<string> GeomObjLiStr;
+        private List<GeomEntry> GeomObjLi;
         public MakeGeomObjList() { }
 
         public MakeGeomObjList(List<string> inputstrli)
         {
-            geomObjLi = new List<string>();
+            GeomObjLiStr = new List<string>();
+            GeomObjLi=new List<GeomEntry>();
             input = new List<string>();
             input = inputstrli;
         }
@@ -74,48 +37,52 @@ namespace dots_dev
             else return Convert.ToInt16(s);
         }
 
-        public List<string> GetGeomObjList()
+        public List<string> GetGeomObjListStr()
         {
-            string[] headerArr = input[0].Split(',');
             for (int i = 1; i < input.Count; i++)
             {
                 int opt = 0; // if 0, use area, ratio else use length, width
 
                 // format of the inputs:
                 /// name[0], area[1], ratio (a:b)[2], number[3], length[4], width[5]
-
-                string name = input[i].Split(',')[0];
-
-                double area = GetDoubleFromString(input[i].Split(',')[1]);
+                string name = input[i].Split(',')[0].Trim().ToUpper();
+                string parent = input[i].Split(',')[1].Trim().ToUpper();
+                if (string.Equals(parent, "") == true || parent == null) parent = "0";
+              
+                double area = GetDoubleFromString(input[i].Split(',')[2]);
                 if (area < 0.01) opt++;
 
-                double ratio = GetDoubleFromString(input[i].Split(',')[2]);
+                double ratio = GetDoubleFromString(input[i].Split(',')[3]);
                 double a = 0.0; double b = 0.0;
-                if (ratio == 0.0) { opt++; }
+                if (ratio < 0.01) { opt++; }
                 else
                 {
                     a = 1 - ratio;
                     b = ratio;
                 }
 
-                int num = Convert.ToInt32(input[i].Split(',')[3]);
+                int num = Convert.ToInt32(input[i].Split(',')[4]);
 
-                double le = GetDoubleFromString(input[i].Split(',')[4]);
-                double wi = GetDoubleFromString(input[i].Split(',')[5]);
+                double le = GetDoubleFromString(input[i].Split(',')[5]);
+                double wi = GetDoubleFromString(input[i].Split(',')[6]);
                 if (le > 0.0 && wi > 0.0) { opt = 0; }
                 else { opt = 1; }
 
                 if (num == 0) continue; // num =0, then continue - do not initialize
-                else
-                {
-                    GeomEntry geom;
-                    if (opt > 0) { geom = new GeomEntry(name, area, a, b, num); }
-                    else { geom = new GeomEntry(name, le, wi, num); }
-                    String str = geom.displayString();
-                    geomObjLi.Add(str);
-                }
+
+                GeomEntry geom;
+                if (opt > 0) { geom = new GeomEntry(name, parent, area, a, b, num); }
+                else { geom = new GeomEntry(name, parent, le, wi, num); }
+                String str = geom.displayString();
+                GeomObjLiStr.Add(str);
+                GeomObjLi.Add(geom);
             }
-            return geomObjLi;
+            return GeomObjLiStr;
         }
-    }
-}
+
+        public List<GeomEntry> GetGeomObj()
+        {
+            return GeomObjLi;
+        }
+    }   // end of public class
+}       // end of namespace

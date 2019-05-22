@@ -17,7 +17,8 @@ namespace dots_dev
         private List<string> FileContents;
 
         private List<string> adjObjLi;
-        private List<string> geomObjLi;
+        private List<string> geomObjLiStr;
+        private List<GeomEntry> geomObjLi;
 
         public CsvParser(){}
 
@@ -36,16 +37,18 @@ namespace dots_dev
         {
             const Int32 BufferSize = 128;
             using (var fileStream = File.OpenRead(FilePath))
-                using(var streamReader=new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
+            {
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, BufferSize))
                 {
                     String line;
                     int k = 0;
-                    while((line= streamReader.ReadLine())!= null)
+                    while ((line = streamReader.ReadLine()) != null)
                     {
                         FileContents.Add(line);
                         k++;
                     }
                 }
+            }
             return FileContents;
         }
 
@@ -59,9 +62,16 @@ namespace dots_dev
 
         public List<string> GetGeomObjLi (List<string> geomstrList)
         {
-            geomObjLi = new List<string>();
+            geomObjLiStr = new List<string>();
+            geomObjLi = new List<GeomEntry>();
             MakeGeomObjList obj = new MakeGeomObjList(geomstrList);
-            geomObjLi = obj.GetGeomObjList();
+            geomObjLiStr = obj.GetGeomObjListStr(); // file: MakeGeomObjList-string
+            geomObjLi = obj.GetGeomObj(); // file : MakeGeomObjList-object
+            return geomObjLiStr;
+        }
+
+        public List<GeomEntry> GetGeomObjLi()
+        {
             return geomObjLi;
         }
     }
