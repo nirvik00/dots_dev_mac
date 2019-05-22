@@ -65,18 +65,21 @@ namespace dots_dev
             DA.SetDataList(1, geomObjLiStr);
             DA.SetDataList(2, fstr);
 
-
             BspGeom bspgeom = new BspGeom(); // class for geom methods
-            PolylineCurve poly = bspgeom.GenerateInitialCurve(geomObjLi);
+            Polyline poly = bspgeom.GenerateInitialCurve(geomObjLi);
+            List<Point3d> ptLi = new List<Point3d>();
+            IEnumerator<Point3d> pts = poly.GetEnumerator();
+            while (pts.MoveNext())
+            {
+                ptLi.Add(pts.Current);
+            }
             DA.SetData(3, poly);
 
-            List<PolylineCurve> polys=new List<PolylineCurve>();
-            bspgeom.RunRecursions(poly, 0, polys);
+            bspgeom.RunRecursions(ptLi.ToArray(), 0);
             List<PolylineCurve> fpolys = bspgeom.GetFPolys();
             List<string> rvals = bspgeom.GetRVals();
             DA.SetDataList(4, rvals);
             DA.SetDataList(5, fpolys);
-
         }
 
         protected override System.Drawing.Bitmap Icon { get { return null; } }

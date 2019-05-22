@@ -9,7 +9,8 @@ namespace dots_dev
 {
     public class BspGeom
     {
-        List<PolylineCurve> fPolys = new List<PolylineCurve>();
+        List<Polyline> fPolys = new List<Polyline>();
+        List<PolylineCurve> fPolyCrv = new List<PolylineCurve>();
         List<string> rVal = new List<string>();
         Random rnd = new Random();
 
@@ -17,14 +18,14 @@ namespace dots_dev
 
         public List<PolylineCurve> GetFPolys()
         {
-            return fPolys;
+            return fPolyCrv;
         }
         public List<string> GetRVals()
         {
             return rVal;
         }
 
-        public PolylineCurve GenerateInitialCurve(List<GeomEntry> geomobjli)
+        public Polyline GenerateInitialCurve(List<GeomEntry> geomobjli)
         {
 
             double sum = 0.0;
@@ -42,43 +43,41 @@ namespace dots_dev
             pts[2] = new Point3d(di, di, 0);
             pts[3] = new Point3d(0, di, 0);
             pts[4] = new Point3d(0, 0, 0);
-            PolylineCurve poly = new PolylineCurve(pts);
+            Polyline poly = new Polyline(pts);
             return poly;
         }
 
-        public void RunRecursions(PolylineCurve poly, int counter, List<PolylineCurve> POLYS)
+        //public void RunRecursions(PolylineCurve poly, int counter, List<PolylineCurve> POLYS)
+        public void RunRecursions(Point3d[] inpPolyPts, int counter)
         {
             counter++;
             double t = rnd.NextDouble();
-            PolylineCurve[] polys;
-            if (t < 0.5) { polys = verSplit(poly); }
-            else { polys = horSplit(poly); }
+            List<Point3d[]> retPolyPts;
+            if (t < 0.5) { retPolyPts = VerSplit(inpPolyPts); }
+            else { retPolyPts = HorSplit(inpPolyPts); }
+
+            // recursion call
             if (counter < 3)
             {
-                RunRecursions(polys[0], counter, POLYS);
-                RunRecursions(polys[1], counter, POLYS);
+                RunRecursions(retPolyPts[0], counter);
+                RunRecursions(retPolyPts[1], counter);
             }
             else
             {
-                fPolys.Add(polys[0]);
-                fPolys.Add(polys[1]);
+                // first polyline curve
+                PolylineCurve crv0 = new PolylineCurve(retPolyPts[0]);
+                fPolyCrv.Add(crv0);
+
+                // second polyline curve
+                PolylineCurve crv1 = new PolylineCurve(retPolyPts[1]);
+                fPolyCrv.Add(crv1);
             }
         }
 
-        public PolylineCurve[] verSplit(PolylineCurve crv)
+        public List<Point3d[]> VerSplit(Point3d[] arr)
         {
-            var T = crv.TryGetPolyline(out Polyline poly);
-            List<Point3d> Pts = new List<Point3d>();
-            IEnumerator<Point3d> pts = poly.GetEnumerator();
-            while(pts.MoveNext()) { 
-                Pts.Add(pts.Current); 
-            }
-
-            Point3d[] arr = Pts.ToArray();
-
             double t = rnd.NextDouble();
             if (t < 0.2) t = 0.2;
-           
             rVal.Add(t.ToString());
 
             // input
@@ -92,27 +91,15 @@ namespace dots_dev
             Point3d f = new Point3d(b.X, e.Y, 0);
             Point3d[] pts1 = { a, b, f, e, a };
             Point3d[] pts2 = { e, f, c, d, e };
-            PolylineCurve poly1= new PolylineCurve(pts1);
-            PolylineCurve poly2 = new PolylineCurve(pts2);
-            PolylineCurve[] polys = { poly1, poly2 };
-            return polys;
+
+            List<Point3d[]> ptLi = new List<Point3d[]> { pts1, pts2 };
+            return ptLi;
         }
 
-        public PolylineCurve[] horSplit(PolylineCurve crv)
+        public List<Point3d[]> HorSplit(Point3d[] arr)
         {
-            var T = crv.TryGetPolyline(out Polyline poly);
-            List<Point3d> Pts = new List<Point3d>();
-            IEnumerator<Point3d> pts = poly.GetEnumerator();
-            while (pts.MoveNext())
-            {
-                Pts.Add(pts.Current);
-            }
-
-            Point3d[] arr = Pts.ToArray();
-
             double t = rnd.NextDouble();
             if (t < 0.2) t = 0.2;
-
             rVal.Add(t.ToString());
 
             // input 
@@ -126,16 +113,12 @@ namespace dots_dev
             Point3d f = new Point3d(e.X, d.Y , 0);
             Point3d[] pts1 = { a, e, f, d, a };
             Point3d[] pts2 = { e, b, c, f, e };
-            PolylineCurve poly1 = new PolylineCurve(pts1);
-            PolylineCurve poly2 = new PolylineCurve(pts2);
-            PolylineCurve[] polys = { poly1, poly2 };
-            return polys;
+
+            List<Point3d[]> ptLi = new List<Point3d[]>{ pts1, pts2 };
+            return ptLi;
         }
     }
 }
-
-
-
 
 
 
